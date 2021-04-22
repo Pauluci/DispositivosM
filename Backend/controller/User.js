@@ -1,8 +1,9 @@
 const User = require('../model/User')
 //CRUD - CREATE - READ- UPDATE - DELETE
 module.exports ={
-    index(req, res){
-        return res.json({mensagem: 'Rota de todos os usuarios'})
+    async index(req, res){
+        let users = await User.find()
+        return res.json(users)
     },
 
     async store(req,res){
@@ -11,14 +12,26 @@ module.exports ={
         return res.json(user)
       },
 
-    update(req, res){
+      async update(req,res){
+        //recupera o Id que pela url query e guarda na variavel id
         var id = req.query.id;
-        var produto = req.body.produto;
-        return res.json({mensagem: 'Atualizar o produto ' + id +' com os dados do post ' + produto.nome})
-    },
+        //recupera as inf do post em 
 
-    delete(req, res){
-        var id = req.query.id;
-        return res.json({mensagem: 'Deleta o produto ' + id})
-    }
+        let user = await User.findById(id);
+        user.name = req.body.name;
+        user.email = req.body.email;
+        user.age = req.body.age;
+        user.password = req.body.password;
+        user = await User.updateOne({'_id': req.query.id} , user)
+    
+        return res.json({messagem : 'Atualizar o user ' + id +' com os dados do post '+ user.name})
+      },
+
+    async delete(req,res){
+    var id = req.query.id;
+    let user = await User.findById(id);
+    user = await User.deleteOne(user);
+    return res.json(user);
+    
+  }
 }
